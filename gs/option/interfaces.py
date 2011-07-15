@@ -25,4 +25,4 @@ class IGSOptionConverter(zope.interface.Interface):
         """
 
 class IGSStorageOption(zope.interface.Interface):
-    value = zope.schema.Text()
+    pass

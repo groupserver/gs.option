@@ -6,8 +6,6 @@ import interfaces
 
 class BaseRDBOption(object):
     zope.interface.implements(interfaces.IGSStorageOption)
-    def __init__(self, value):
-        self.value = value
     
 class GSIntegerConverter(object):
     """ A data converter for integers.
@@ -17,16 +15,14 @@ class GSIntegerConverter(object):
     zope.component.adapts(
         zope.schema.interfaces.IInt, interfaces.IGSStorageOption)
     
-    schemaType = int
-    storageType = unicode
     errorMessage = _('The value was not a valid integer literal.')
     def __init__(self, schemaoption, storageoption):
         self.schemaoption = schemaoption
         self.storageoption = storageoption
 
     def toStorageValue(self, value):
-        return self.storageType(value)
+        return unicode(value)
 
     def toSchemaValue(self, value):
-        return self.schemaType(value)
+        return self.schemaoption.fromUnicode(value)
     
