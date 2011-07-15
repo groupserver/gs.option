@@ -1,5 +1,5 @@
 import zope.interface
-import zope.schema.Text
+import zope.schema
 
 class IGSOptionConverter(zope.interface.Interface):
     def toStorageValue():
@@ -25,4 +25,4 @@ class IGSOptionConverter(zope.interface.Interface):
         """
 
 class IGSStorageOption(zope.interface.Interface):
-    value = Text()
+    value = zope.schema.Text()

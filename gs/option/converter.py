@@ -9,7 +9,7 @@ class BaseRDBOption(object):
     def __init__(self, value):
         self.value = value
     
-class GSIntegerDataConverter(object):
+class GSIntegerConverter(object):
     """ A data converter for integers.
     
     """
