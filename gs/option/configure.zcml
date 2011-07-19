@@ -4,21 +4,21 @@
     
   <!-- Data Converters -->
   <adapter
-      factory=".converter.GSIntConverterRDB"
+      factory="gs.option.converter.GSIntConverterRDB"
       />
   <adapter
-      factory=".converter.GSFloatConverterRDB"
+      factory="gs.option.converter.GSFloatConverterRDB"
       />
   <adapter
-      factory=".converter.GSBoolConverterRDB"
+      factory="gs.option.converter.GSBoolConverterRDB"
       />
   <adapter
-      factory=".converter.GSTextConverterRDB"
+      factory="gs.option.converter.GSTextConverterRDB"
       />
     
   <!-- Option Factory -->
   <utility 
-    factory=".converter.GSOptionFactory"
+    factory="gs.option.option.GSOptionFactory"
     />
     
 </configure>

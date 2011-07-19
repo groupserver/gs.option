@@ -4,6 +4,7 @@ import zope.interface
 from zope.schema import *
 from zope.schema.interfaces import WrongType
 from gs.option.converter import *
+from gs.option.option import *
 from gs.option.interfaces import IGSOptionConverter, IGSOptionConverterFactory, IGSOption
 from zope.component.factory import IFactory
 from zope.component import provideAdapter, getMultiAdapter, getGlobalSiteManager, queryUtility

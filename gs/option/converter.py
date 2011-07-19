@@ -4,40 +4,8 @@ import zope.schema
 import interfaces
 from zope.component.factory import IFactory
 from zope.component import queryUtility
+from gs.option.option import OptionLookupError
 
-class OptionLookupError(Exception):
-    pass
-
-class GSRDBOption(object):
-    zope.interface.implements(interfaces.IGSRDBOption)    
-
-    def __init__(self, context, componentId, optionId):
-        self.context = context
-        self.componentId = componentId
-        self.optionId = optionId
-        
-        self.converter = self.getConverter()
-        
-    def getConverter(self):
-        converterFactory = queryUtility(interfaces.IGSOptionConverter,
-                                        name="%s.options" % self.componentId)
-        if not converterFactory:
-            raise OptionLookupError("No such component %s" % self.componentId)
-        
-        return converterFactory(self.context, self.optionId, self)
-
-    def get(self, siteId=None, groupId=None):
-        pass
-    
-    def set(self, value, siteId=None, groupId=None):
-        pass
-
-class GSOptionFactory(object):
-    zope.interface.implements(IFactory)
-    
-    def __call__(self, context, componentId, optionId, siteId, groupId):
-        return GSRDBOption(context, componentId, optionId, siteId, groupId)
-    
 class GSOptionConverterFactory(object):
     """ Returns an option converter using optionID and StorageOption as descriminators.
     
