@@ -2,9 +2,23 @@
     xmlns="http://namespaces.zope.org/zope"
     xmlns:i18n="http://namespaces.zope.org/i18n">
     
-    <!-- Data Converters -->
+  <!-- Data Converters -->
   <adapter
-      factory=".converter.GSIntegerConverter"
+      factory=".converter.GSIntConverterRDB"
       />
+  <adapter
+      factory=".converter.GSFloatConverterRDB"
+      />
+  <adapter
+      factory=".converter.GSBoolConverterRDB"
+      />
+  <adapter
+      factory=".converter.GSTextConverterRDB"
+      />
+    
+  <!-- Option Factory -->
+  <utility 
+    factory=".converter.GSOptionFactory"
+    />
     
 </configure>
