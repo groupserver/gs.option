@@ -19,6 +19,8 @@ from gs.option import queries
 
 import random
 
+from database_setup import *
+
 class ITestOptions(zope.interface.Interface):
     text_id = Text()
     int_id = Int()
@@ -36,18 +38,20 @@ class TestOptionsFactory2(GSOptionConverterFactory):
 
 class RDBTest(ZopeTestCase):
     def afterSetUp(self):
+        dbsetup()
         zcml.load_config('meta.zcml', Products.Five)
         zcml.load_config('permissions.zcml', Products.Five)
         zcml.load_config('configure.zcml', gs.option)
+        
         alchemy_adaptor = manage_addZSQLAlchemy(self.folder, 'zalchemy')
         
-        alchemy_adaptor.manage_changeProperties( hostname='localhost',
-                                                 port=5432,
-                                                 username='gstest',
-                                                 password='',
-                                                 dbtype='postgres',
-                                                 database='gstestdb')
-
+        alchemy_adaptor.manage_changeProperties(hostname='localhost',
+                                                port=5432,
+                                                username=DATABASE_USER,
+                                                password='',
+                                                dbtype='postgres',
+                                                database=DATABASE_NAME)
+        
         self.da = alchemy_adaptor
         self.componentId = 'component_id'
         self.optionId = 'option_id'
@@ -72,7 +76,10 @@ class RDBTest(ZopeTestCase):
         self.assertEqual(optionQuery.get(),rid1)
         self.assertEqual(optionQuery.get('site'),rid2)
         self.assertEqual(optionQuery.get('site','group'),rid3)
-        
+    
+    def beforeTearDown(self):
+        dbteardown()
+    
 class ConverterTest(TestCase):
     def setUp(self):
         self.gsm = getGlobalSiteManager()
