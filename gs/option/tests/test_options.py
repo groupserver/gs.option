@@ -99,13 +99,15 @@ class RDBOptionTest(RDBBaseTest):
         option = createObject('groupserver.Option', self.folder, 'gs.option.tests', 'int_id')
 
         self.assertEquals(option.get('someSite'), None)
-        self.assertEquals(option.get('someSite','someGroup'), None)
+        self.assertEquals(option.get('someSite', 'someGroup'), None)
         
-        self.assertEquals(option.set(42,'someSite'), None)
-        self.assertEquals(option.set(84,'someSite', 'someGroup'), None)
+        self.assertEquals(option.set(42, 'someSite'), None)
+        self.assertEquals(option.set(84, 'someSite', 'someGroup'), None)
         
         self.assertEquals(option.get('someSite'), 42)
         self.assertEquals(option.get('someSite', 'someGroup'), 84)
+        
+        # note: we reset the table between tests, so this should return None
         self.assertEquals(option.get(), None)
         
     def test_03_OptionConverter(self):
@@ -125,16 +127,16 @@ class BasicOptionTest(TestCase):
         self.gsm.registerUtility(factory=TestOptionsFactory, provided=IGSOptionConverter, name="gs.option.tests.options")
         self.gsm.registerUtility(factory=TestOptionsFactory2, provided=IGSOptionConverter, name="gs.option.tests2.options")
         
-    def testOptionFactoryUtility(self):
+    def test_01_OptionFactoryUtility(self):
         optionFactory = getUtility(IGSOption)
         assert isinstance(optionFactory, GSRAMOptionFactory)
           
-    def testOptionConverterFromOption(self):
+    def test_02_OptionConverterFromOption(self):
         optionFactory = getUtility(IGSOption)
         option = optionFactory(None, 'gs.option.tests', 'int_id')
         assert isinstance(option.converter, GSIntConverterBasic)
 
-    def testOptionFactoryFailedComponentLookup(self):
+    def test_03_OptionFactoryFailedComponentLookup(self):
         self.assertRaises(ComponentLookupError,
                           getUtility, IGSOptionConverter, name="gs.option.tests.thisdoesntexist")
         
@@ -143,14 +145,14 @@ class BasicOptionTest(TestCase):
         self.assertRaises(ComponentLookupError,
                           optionFactory, None, 'gs.option.tests.nomodule', 'thisdoesntexist')
         
-    def testOptionStorageNoQualifiers(self):
+    def test_04_OptionStorageNoQualifiers(self):
         optionFactory = getUtility(IGSOption)
         option = optionFactory(None, 'gs.option.tests', 'int_id')
         self.assertEquals(option.get(), None)
         self.assertEquals(option.set(21), None)
         self.assertEquals(option.get(), 21)
         
-    def testOptionStorageQualified(self):
+    def test_05_OptionStorageQualified(self):
         optionFactory = getUtility(IGSOption)
         option = optionFactory(None, 'gs.option.tests', 'int_id')
         
@@ -162,9 +164,12 @@ class BasicOptionTest(TestCase):
         
         self.assertEquals(option.get('someSite'), 42)
         self.assertEquals(option.get('someSite', 'someGroup'), 84)
-        self.assertEquals(option.get(), None)
         
-    def testOptionConverter(self):
+        # because we don't reset the storage between tests, this should return
+        # the result of the set in test_04.
+        self.assertEquals(option.get(), 21)
+        
+    def test_06_OptionConverter(self):
         optionFactory = getUtility(IGSOption)
         option = optionFactory(None, 'gs.option.tests', 'int_id')
         
