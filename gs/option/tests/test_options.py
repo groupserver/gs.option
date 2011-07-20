@@ -8,7 +8,7 @@ from gs.option.option import *
 from gs.option.interfaces import IGSOptionConverter, IGSOption
 from zope.component.factory import IFactory
 from zope.component.interfaces import ComponentLookupError
-from zope.component import provideAdapter, getMultiAdapter, getGlobalSiteManager, getUtility
+from zope.component import provideAdapter, getMultiAdapter, getGlobalSiteManager, getUtility, createObject
 from zope.app.testing.setup import placefulSetUp, placefulTearDown
 from Products.ZSQLAlchemy.ZSQLAlchemy import manage_addZSQLAlchemy
 import Products.Five
@@ -51,7 +51,7 @@ class RDBBaseTest(ZopeTestCase):
         zcml.load_config('configure.zcml', gs.option)
         
         gsm = getGlobalSiteManager()
-        gsm.registerUtility(factory=TestOptionsFactory, provided=IGSOptionConverter, name="gs.option.tests.options")
+        gsm.registerUtility(factory=TestOptionsFactory, name="gs.option.tests.options")
         
         alchemy_adaptor = manage_addZSQLAlchemy(self.folder, 'zsqlalchemy')
         
@@ -66,12 +66,7 @@ class RDBBaseTest(ZopeTestCase):
         self.componentId = 'component_id'
         self.optionId = 'option_id'
         
-        #self.afterAfterSetup()
-        
 class RDBBackendTest(RDBBaseTest):
-    #def afterAfterSetup(self):
-    #    pass
-    
     def test_01_OptionQuery(self):
         optionQuery = queries.OptionQuery(self.da,
                                           self.componentId,
@@ -95,16 +90,14 @@ class RDBBackendTest(RDBBaseTest):
 
 class RDBOptionTest(RDBBaseTest):
     def test_01_OptionStorageNoQualifiers(self):
-        optionFactory = getUtility(IGSOption)
-        option = optionFactory(self.folder, 'gs.option.tests', 'int_id')
+        option = createObject('groupserver.Option', self.folder, 'gs.option.tests', 'int_id')
         self.assertEquals(option.get(), None)
         self.assertEquals(option.set(21), None)
         self.assertEquals(option.get(), 21)
         
     def test_02_OptionStorageQualified(self):
-        optionFactory = getUtility(IGSOption)
-        option = optionFactory(self.folder, 'gs.option.tests', 'int_id')
-        
+        option = createObject('groupserver.Option', self.folder, 'gs.option.tests', 'int_id')
+
         self.assertEquals(option.get('someSite'), None)
         self.assertEquals(option.get('someSite','someGroup'), None)
         
@@ -116,11 +109,8 @@ class RDBOptionTest(RDBBaseTest):
         self.assertEquals(option.get(), None)
         
     def test_03_OptionConverter(self):
-        gsm = getGlobalSiteManager()
-        gsm.registerUtility(factory=TestOptionsFactory, provided=IGSOptionConverter, name="gs.option.tests.options")
-        
-        optionFactory = getUtility(IGSOption)
-        option = optionFactory(self.folder, 'gs.option.tests', 'int_id')
+        option = createObject('groupserver.Option', self.folder, 'gs.option.tests', 'int_id')
+
         self.assertRaises(WrongType, option.set, '42', None)
     
 class BasicOptionTest(TestCase):

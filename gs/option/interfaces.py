@@ -40,7 +40,7 @@ class IGSOption(zope.interface.Interface):
             
             This must both insert missing options, and update options that exist.
         """
-        
+
 class IGSRDBOption(IGSOption):
     pass
 

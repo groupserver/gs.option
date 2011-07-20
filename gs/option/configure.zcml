@@ -40,10 +40,10 @@
           for="zope.schema.interfaces.IText gs.option.interfaces.IGSRAMOption"
           />
           
-  <!-- Option Factory -->
+  <!-- Option -->
   <utility 
     factory="gs.option.option.GSRDBOptionFactory"
-    provides="gs.option.interfaces.IGSOption"
+    name="groupserver.Option"
     />
     
 </configure>

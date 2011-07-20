@@ -7,7 +7,7 @@ from gs.option.converter import *
 from gs.option.option import *
 from gs.option.interfaces import IGSOptionConverter, IGSOption
 from zope.component.factory import IFactory
-from zope.component import provideAdapter, getMultiAdapter, getGlobalSiteManager, getUtility
+from zope.component import provideAdapter, getMultiAdapter, getGlobalSiteManager, getUtility, createObject
 from zope.app.testing.setup import placefulSetUp, placefulTearDown
 from Products.ZSQLAlchemy.ZSQLAlchemy import manage_addZSQLAlchemy
 import Products.Five
@@ -45,23 +45,20 @@ class ConverterTest(TestCase):
         zcml.load_config('permissions.zcml', Products.Five)
         zcml.load_config('configure.zcml', gs.option)
         
-        #self.gsm.registerUtility(factory=GSRDBOptionFactory, provided=IGSOption)
-        self.gsm.registerUtility(factory=TestOptionsFactory, provided=IGSOptionConverter, name="gs.option.tests.options")
-        self.gsm.registerUtility(factory=TestOptionsFactory2, provided=IGSOptionConverter, name="gs.option.tests2.options")
+        self.gsm.registerUtility(factory=TestOptionsFactory, name="gs.option.tests.options")
+        self.gsm.registerUtility(factory=TestOptionsFactory2, name="gs.option.tests2.options")
         
     def testOptionConverterFactory(self):
-        optionFactory = getUtility(IGSOption)
-        option = optionFactory(None, 'gs.option.tests2', 'int_id')
+        option = createObject('groupserver.Option', None, 'gs.option.tests2', 'int_id')
         
-        optionConverterFactory = getUtility(IGSOptionConverter, name="gs.option.tests.options")
-        assert isinstance(optionConverterFactory(None, 'text_id', option), GSTextConverterBasic)
+        optionConverter = createObject("gs.option.tests.options", None, "text_id", option)
+        assert isinstance(optionConverter, GSTextConverterBasic)
         
-        optionConverterFactory = getUtility(IGSOptionConverter, name="gs.option.tests.options")
-        assert isinstance(optionConverterFactory(None, 'int_id', option), GSIntConverterBasic)
+        optionConverter = createObject("gs.option.tests.options", None, "int_id", option)
+        assert isinstance(optionConverter, GSIntConverterBasic)
     
     def testOptionConverterFromOption(self):
-        optionFactory = getUtility(IGSOption)
-        option = optionFactory(None, 'gs.option.tests', 'int_id')
+        option = createObject('groupserver.Option', None, 'gs.option.tests', 'int_id')
         assert isinstance(option.converter, GSIntConverterBasic)
   
 class BaseConverterTest(TestCase):
@@ -74,16 +71,14 @@ class BaseConverterTest(TestCase):
         
         # register an option converter factory for the test case
         gsm = getGlobalSiteManager()
-        gsm.registerUtility(factory=TestOptionsFactory, provided=IGSOptionConverter, name="gs.option.tests.options")
+        gsm.registerUtility(factory=TestOptionsFactory, name="gs.option.tests.options")
         
-        optionFactory = getUtility(IGSOption)
-
-        self._setupOption(optionFactory)
+        self._setupOption()
   
 class IntTest(BaseConverterTest):
-    def _setupOption(self, optionFactory):
-        self.option = optionFactory(None, 'gs.option.tests', 'int_id')
-  
+    def _setupOption(self):
+        self.option = createObject('groupserver.Option', None, 'gs.option.tests', 'int_id')
+
     def testConvertToSchemaValue(self):
         self.assertEqual(type(self.option.converter.toSchemaValue('1')), int)
         self.assertEqual(type(self.option.converter.toSchemaValue('1'*100)), long)
@@ -101,9 +96,9 @@ class IntTest(BaseConverterTest):
         self.assertRaises(WrongType, self.option.converter.toStorageValue, {'1':2})
         
 class BoolTest(BaseConverterTest):
-    def _setupOption(self, optionFactory):
-        self.option = optionFactory(None, 'gs.option.tests', 'bool_id')
-        
+    def _setupOption(self):
+        self.option = createObject('groupserver.Option', None, 'gs.option.tests', 'bool_id')
+
     def testConvertToSchemaValue(self):
         self.assertEqual(type(self.option.converter.toSchemaValue('True')), bool)
         self.assertEqual(type(self.option.converter.toSchemaValue('False')), bool)
@@ -121,8 +116,8 @@ class BoolTest(BaseConverterTest):
         self.assertRaises(WrongType, self.option.converter.toStorageValue, {'1':2})
         
 class FloatTest(BaseConverterTest):
-    def _setupOption(self, optionFactory):
-        self.option = optionFactory(None, 'gs.option.tests', 'float_id')
+    def _setupOption(self):
+        self.option = createObject('groupserver.Option', None, 'gs.option.tests', 'float_id')
         
     def testConvertToSchemaValue(self):
         self.assertEqual(type(self.option.converter.toSchemaValue('1.0')), float)
@@ -140,8 +135,8 @@ class FloatTest(BaseConverterTest):
         self.assertRaises(WrongType, self.option.converter.toStorageValue, {'1':2})
 
 class TextTest(BaseConverterTest):
-    def _setupOption(self, optionFactory):
-        self.option = optionFactory(None, 'gs.option.tests', 'text_id')
+    def _setupOption(self):
+        self.option = createObject('groupserver.Option', None, 'gs.option.tests', 'text_id')
                 
     def testConvertToSchemaValue(self):
         self.assertEqual(type(self.option.converter.toSchemaValue(u'This is some text')), unicode)

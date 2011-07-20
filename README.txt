@@ -10,9 +10,10 @@ First, an example. To lookup the option "app_id", used by the component
 "gs.profile.signup.facebook" we first instantiate an option instance for the
 component and option identifier: 
 
-   >>> option = queryUtility(IGSOption)(context,
-                                        'gs.profile.signup.facebook',
-                                        'app_id')
+   >>> option = createObject("groupserver.Option",
+                             context,
+                             'gs.profile.signup.facebook',
+                             'app_id')
    >>> value = option.get()
    None
    >>> option.set(21)

@@ -1,5 +1,6 @@
 import zope.component
 import zope.interface
+import zope.interface.declarations
 import zope.schema
 import interfaces
 from zope.component.factory import IFactory
@@ -13,8 +14,10 @@ class GSOptionConverterFactory(object):
     
     """
     zope.interface.implements(IFactory)
+    
     title = u'GroupServer Option Converter Factory'
     description = u'Creates a GroupServer option converter for a given component and optionId'
+    
     interface = None
 
     def __call__(self, context, optionId, storageOption):
@@ -27,7 +30,7 @@ class GSOptionConverterFactory(object):
                                               interfaces.IGSOptionConverter)
         
     def getInterfaces(self):
-        return [interfaces.IGSOptionConverter]
+        return zope.interface.declarations.Implements([interfaces.IGSOptionConverter])
 
 class GSBaseConverter(object):
     """ A standard data converter for non-tricky types.
