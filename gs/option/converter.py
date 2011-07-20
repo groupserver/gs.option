@@ -12,6 +12,7 @@ class GSOptionConverterFactory(object):
         StorageOption is necessary to determine what kind of backend storage we are dealing with.
     
     """
+    zope.interface.implements(IFactory)
     title = u'GroupServer Option Converter Factory'
     description = u'Creates a GroupServer option converter for a given component and optionId'
     interface = None
@@ -26,7 +27,7 @@ class GSOptionConverterFactory(object):
                                               interfaces.IGSOptionConverter)
         
     def getInterfaces(self):
-        return [self.interface]
+        return [interfaces.IGSOptionConverter]
 
 class GSBaseConverter(object):
     """ A standard data converter for non-tricky types.
@@ -50,40 +51,27 @@ class GSBaseConverter(object):
         
         return value
 
-class GSBoolConverterRDB(GSBaseConverter):
+class GSBoolConverterBasic(GSBaseConverter):
     """ A data converter for booleans.
     
     """
-    zope.component.adapts(zope.schema.interfaces.IBool,
-                          interfaces.IGSRDBOption)
-    
     errorMessage = u'The value was not a valid boolean literal.'
-
     
-class GSIntConverterRDB(GSBaseConverter):
+class GSIntConverterBasic(GSBaseConverter):
     """ A data converter for integers.
     
-    """
-    zope.component.adapts(zope.schema.interfaces.IInt,
-                          interfaces.IGSRDBOption)
-    
+    """    
     errorMessage = u'The value was not a valid integer literal.'
     
-class GSFloatConverterRDB(GSBaseConverter):
+class GSFloatConverterBasic(GSBaseConverter):
     """ A data converter for floats.
     
     """
-    zope.component.adapts(zope.schema.interfaces.IFloat,
-                          interfaces.IGSRDBOption)
-    
     errorMessage = u'The value was not a valid float literal.'
 
-class GSTextConverterRDB(GSBaseConverter):
+class GSTextConverterBasic(GSBaseConverter):
     """ A data converter for unicode. The text must be in unicode,
         not as a byte stream.
     
     """
-    zope.component.adapts(zope.schema.interfaces.IText,
-                          interfaces.IGSRDBOption)
-    
     errorMessage = u'The value was not valid text.'

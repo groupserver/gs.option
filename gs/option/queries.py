@@ -26,7 +26,7 @@ class OptionQuery(object):
         retval = None 
         if r.rowcount:
             retval = r.fetchone()['value']
-        
+
         return retval
         
     def set(self, value, groupId=None, siteId=None):

@@ -3,22 +3,47 @@
     xmlns:i18n="http://namespaces.zope.org/i18n">
     
   <!-- Data Converters -->
-  <adapter
-      factory="gs.option.converter.GSIntConverterRDB"
-      />
-  <adapter
-      factory="gs.option.converter.GSFloatConverterRDB"
-      />
-  <adapter
-      factory="gs.option.converter.GSBoolConverterRDB"
-      />
-  <adapter
-      factory="gs.option.converter.GSTextConverterRDB"
-      />
-    
+  
+    <!-- For IGSRDBOption -->
+      <adapter
+          factory="gs.option.converter.GSIntConverterBasic"
+          for="zope.schema.interfaces.IInt gs.option.interfaces.IGSRDBOption"
+          />
+      <adapter
+          factory="gs.option.converter.GSFloatConverterBasic"
+          for="zope.schema.interfaces.IFloat gs.option.interfaces.IGSRDBOption"
+          />
+      <adapter
+          factory="gs.option.converter.GSBoolConverterBasic"
+          for="zope.schema.interfaces.IBool gs.option.interfaces.IGSRDBOption"
+          />
+      <adapter
+          factory="gs.option.converter.GSTextConverterBasic"
+          for="zope.schema.interfaces.IText gs.option.interfaces.IGSRDBOption"
+          />
+          
+    <!-- For IGSRAMOption -->
+      <adapter
+          factory="gs.option.converter.GSIntConverterBasic"
+          for="zope.schema.interfaces.IInt gs.option.interfaces.IGSRAMOption"
+          />
+      <adapter
+          factory="gs.option.converter.GSFloatConverterBasic"
+          for="zope.schema.interfaces.IFloat gs.option.interfaces.IGSRAMOption"
+          />
+      <adapter
+          factory="gs.option.converter.GSBoolConverterBasic"
+          for="zope.schema.interfaces.IBool gs.option.interfaces.IGSRAMOption"
+          />
+      <adapter
+          factory="gs.option.converter.GSTextConverterBasic"
+          for="zope.schema.interfaces.IText gs.option.interfaces.IGSRAMOption"
+          />
+          
   <!-- Option Factory -->
   <utility 
-    factory="gs.option.option.GSOptionFactory"
+    factory="gs.option.option.GSRDBOptionFactory"
+    provides="gs.option.interfaces.IGSOption"
     />
     
 </configure>

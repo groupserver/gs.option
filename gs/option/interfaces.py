@@ -31,16 +31,18 @@ class IGSOption(zope.interface.Interface):
     
     def get(self, siteId=None, groupId=None):
         """ Fetch the value of the option, further descriminating by the siteId
-            and groupId.    
+            and groupId.
         """
         
     def set(self, value, siteId=None, groupId=None):
         """ Set the value of the option, further descriminating by the siteId
-            and groupId. 
+            and groupId.
+            
+            This must both insert missing options, and update options that exist.
         """
         
 class IGSRDBOption(IGSOption):
     pass
 
-class IGSOptionConverterFactory(zope.interface.Interface):
+class IGSRAMOption(IGSOption):
     pass

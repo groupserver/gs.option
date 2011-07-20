@@ -5,14 +5,14 @@ from zope.schema import *
 from zope.schema.interfaces import WrongType
 from gs.option.converter import *
 from gs.option.option import *
-from gs.option.interfaces import IGSOptionConverter, IGSOptionConverterFactory, IGSOption
+from gs.option.interfaces import IGSOptionConverter, IGSOption
 from zope.component.factory import IFactory
-from zope.component import provideAdapter, getMultiAdapter, getGlobalSiteManager, queryUtility
+from zope.component import provideAdapter, getMultiAdapter, getGlobalSiteManager, getUtility
 from zope.app.testing.setup import placefulSetUp, placefulTearDown
 from Products.ZSQLAlchemy.ZSQLAlchemy import manage_addZSQLAlchemy
 import Products.Five
 import gs.option
-from Products.Five import zcml
+from Zope2.App import zcml
 from zope.site.folder import Folder, rootFolder
 
 from Testing.ZopeTestCase import ZopeTestCase
@@ -37,107 +37,52 @@ class TestOptionsFactory(GSOptionConverterFactory):
 class TestOptionsFactory2(GSOptionConverterFactory):
     interface = ITestOptions2
 
-class RDBTest(ZopeTestCase):    
-    def afterSetUp(self):
-        if not ds.dbSetupDone:
-            ds.dbteardown()
-            ds.dbsetup()
-            ds.dbSetupDone = True
+class ConverterTest(TestCase):
+    def setUp(self):
+        self.gsm = getGlobalSiteManager()
         
-        ds.dbTable(gs.option.sql, "01_option.sql", ["option"])
         zcml.load_config('meta.zcml', Products.Five)
         zcml.load_config('permissions.zcml', Products.Five)
         zcml.load_config('configure.zcml', gs.option)
         
-        alchemy_adaptor = manage_addZSQLAlchemy(self.folder, 'zalchemy')
-        
-        alchemy_adaptor.manage_changeProperties(hostname='localhost',
-                                                port=5432,
-                                                username=ds.DATABASE_USER,
-                                                password='',
-                                                dbtype='postgres',
-                                                database=ds.DATABASE_NAME)
-        
-        self.da = alchemy_adaptor
-        self.componentId = 'component_id'
-        self.optionId = 'option_id'
-        
-    def testOptionQuery(self):
-        optionQuery = queries.OptionQuery(self.da,
-                                          self.componentId,
-                                          self.optionId)
-        
-    def testSetGetOption(self):
-        optionQuery = queries.OptionQuery(self.da,
-                                          self.componentId,
-                                          self.optionId)
-        rid1 = unicode(random.random())
-        rid2 = unicode(random.random())
-        rid3 = unicode(random.random())
-        
-        optionQuery.set(rid1)
-        optionQuery.set(rid2,'site')
-        optionQuery.set(rid3,'site','group')
-        
-        self.assertEqual(optionQuery.get(),rid1)
-        self.assertEqual(optionQuery.get('site'),rid2)
-        self.assertEqual(optionQuery.get('site','group'),rid3)
-    
-class ConverterTest(TestCase):
-    def setUp(self):
-        self.gsm = getGlobalSiteManager()
-        self.gsm.registerUtility(factory=GSOptionFactory, provided=IGSOption)
+        #self.gsm.registerUtility(factory=GSRDBOptionFactory, provided=IGSOption)
         self.gsm.registerUtility(factory=TestOptionsFactory, provided=IGSOptionConverter, name="gs.option.tests.options")
         self.gsm.registerUtility(factory=TestOptionsFactory2, provided=IGSOptionConverter, name="gs.option.tests2.options")
-        provideAdapter(GSIntConverterRDB)
-        provideAdapter(GSTextConverterRDB)
-        
-    def testOptionFactoryUtility(self):
-        optionFactory = queryUtility(IGSOption)
-        assert isinstance(optionFactory, GSOptionFactory)
         
     def testOptionConverterFactory(self):
-        optionFactory = queryUtility(IGSOption)
-        option = optionFactory(None, 'gs.option.tests2', 'int_id', None, None)
+        optionFactory = getUtility(IGSOption)
+        option = optionFactory(None, 'gs.option.tests2', 'int_id')
         
-        optionConverterFactory = queryUtility(IGSOptionConverter, name="gs.option.tests.options")
-        assert isinstance(optionConverterFactory(None, 'text_id', option), GSTextConverterRDB)
+        optionConverterFactory = getUtility(IGSOptionConverter, name="gs.option.tests.options")
+        assert isinstance(optionConverterFactory(None, 'text_id', option), GSTextConverterBasic)
         
-        optionConverterFactory = queryUtility(IGSOptionConverter, name="gs.option.tests.options")
-        assert isinstance(optionConverterFactory(None, 'int_id', option), GSIntConverterRDB)
+        optionConverterFactory = getUtility(IGSOptionConverter, name="gs.option.tests.options")
+        assert isinstance(optionConverterFactory(None, 'int_id', option), GSIntConverterBasic)
     
     def testOptionConverterFromOption(self):
-        optionFactory = queryUtility(IGSOption)
-        option = optionFactory(None, 'gs.option.tests', 'int_id', None, None)
-        assert isinstance(option.converter, GSIntConverterRDB)
-
-    def testOptionFactoryFailedComponentLookup(self):
-        # returns None if the component doesn't exist
-        self.assertEquals(queryUtility(IGSOptionConverter, name="gs.option.tests.thisdoesntexist"),
-                          None)
-        
-        optionFactory = queryUtility(IGSOption)
-        
-        self.assertRaises(OptionLookupError,
-                          optionFactory, None, 'gs.option.tests.nomodule', 'thisdoesntexist', None, None)
+        optionFactory = getUtility(IGSOption)
+        option = optionFactory(None, 'gs.option.tests', 'int_id')
+        assert isinstance(option.converter, GSIntConverterBasic)
   
 class BaseConverterTest(TestCase):
     def setUp(self):
-        provideAdapter(GSBoolConverterRDB)
-        provideAdapter(GSFloatConverterRDB)
-        provideAdapter(GSIntConverterRDB)
-        provideAdapter(GSTextConverterRDB)
+        # setup the converter adapters and option factory registered in the
+        # gs.option -> configure.zcml
+        zcml.load_config('meta.zcml', Products.Five)
+        zcml.load_config('permissions.zcml', Products.Five)
+        zcml.load_config('configure.zcml', gs.option)
         
+        # register an option converter factory for the test case
         gsm = getGlobalSiteManager()
-        gsm.registerUtility(factory=GSOptionFactory, provided=IGSOption)
         gsm.registerUtility(factory=TestOptionsFactory, provided=IGSOptionConverter, name="gs.option.tests.options")
-        optionFactory = queryUtility(IGSOption)
+        
+        optionFactory = getUtility(IGSOption)
 
         self._setupOption(optionFactory)
   
 class IntTest(BaseConverterTest):
     def _setupOption(self, optionFactory):
-        self.option = optionFactory(None, 'gs.option.tests', 'int_id', None, None)
+        self.option = optionFactory(None, 'gs.option.tests', 'int_id')
   
     def testConvertToSchemaValue(self):
         self.assertEqual(type(self.option.converter.toSchemaValue('1')), int)
@@ -157,7 +102,7 @@ class IntTest(BaseConverterTest):
         
 class BoolTest(BaseConverterTest):
     def _setupOption(self, optionFactory):
-        self.option = optionFactory(None, 'gs.option.tests', 'bool_id', None, None)
+        self.option = optionFactory(None, 'gs.option.tests', 'bool_id')
         
     def testConvertToSchemaValue(self):
         self.assertEqual(type(self.option.converter.toSchemaValue('True')), bool)
@@ -177,7 +122,7 @@ class BoolTest(BaseConverterTest):
         
 class FloatTest(BaseConverterTest):
     def _setupOption(self, optionFactory):
-        self.option = optionFactory(None, 'gs.option.tests', 'float_id', None, None)
+        self.option = optionFactory(None, 'gs.option.tests', 'float_id')
         
     def testConvertToSchemaValue(self):
         self.assertEqual(type(self.option.converter.toSchemaValue('1.0')), float)
@@ -196,7 +141,7 @@ class FloatTest(BaseConverterTest):
 
 class TextTest(BaseConverterTest):
     def _setupOption(self, optionFactory):
-        self.option = optionFactory(None, 'gs.option.tests', 'text_id', None, None)
+        self.option = optionFactory(None, 'gs.option.tests', 'text_id')
                 
     def testConvertToSchemaValue(self):
         self.assertEqual(type(self.option.converter.toSchemaValue(u'This is some text')), unicode)
@@ -215,12 +160,11 @@ class TextTest(BaseConverterTest):
 
 def test_suite():
    suite = TestSuite()
-   #suite.addTest(makeSuite(ConverterTest))
-   #suite.addTest(makeSuite(BoolTest))
-   #suite.addTest(makeSuite(FloatTest))
-   #suite.addTest(makeSuite(IntTest))
-   #suite.addTest(makeSuite(TextTest))
-   suite.addTest(makeSuite(RDBTest))
+   suite.addTest(makeSuite(ConverterTest))
+   suite.addTest(makeSuite(BoolTest))
+   suite.addTest(makeSuite(FloatTest))
+   suite.addTest(makeSuite(IntTest))
+   suite.addTest(makeSuite(TextTest))
    
    return suite
 

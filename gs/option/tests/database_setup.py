@@ -20,7 +20,7 @@ def dbTable(module, filename, dropTables=[]):
     sql_filepath = os.path.join(path,filename)
     for table in dropTables:
         print "dropping table %s" % table
-        execute("echo 'drop %s' | psql -U%s %s" % (table,DATABASE_USER,DATABASE_NAME))
+        execute("echo 'drop table %s' | psql -U%s %s" % (table,DATABASE_USER,DATABASE_NAME))
     
     print "setting up table"
     code,result = execute("cat %s | psql -U%s %s" % (sql_filepath,
