@@ -79,6 +79,25 @@ Options from different parts of the hierarchy can still be retrieved::
    >>> option.get()
    21
 
+Component Options
+-----------------
+
+Sometimes it is more convenient to handle all the options for a module at
+once. In this case the ``ComponentOptions`` can be used. It is similar to
+the ``Option`` class except the option identifier is always passed in::
+
+    >>> from gs.option import ComponentOptions
+    >>> options = ComponentOptions(self.context, 'gs.profile.signup.facebook')
+    >>> options.get('app_id')
+    21
+    >>> option.get('app_id', site_id)
+    42
+    >>> options.get('app_id', site_id, group_id)
+    84
+    >>> options.set('app_id', 9)
+    >>> options.get('app_id')
+    9
+
 Declaring Options
 =================
 
