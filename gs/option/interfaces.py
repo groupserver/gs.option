@@ -1,3 +1,4 @@
+# coding=utf-8
 import zope.interface
 import zope.schema
 
@@ -46,3 +47,4 @@ class IGSRDBOption(IGSOption):
 
 class IGSRAMOption(IGSOption):
     pass
+

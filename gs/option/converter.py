@@ -1,3 +1,4 @@
+# coding=utf-8
 import zope.component
 import zope.interface
 import zope.interface.declarations
@@ -78,3 +79,4 @@ class GSTextConverterBasic(GSBaseConverter):
     
     """
     errorMessage = u'The value was not valid text.'
+

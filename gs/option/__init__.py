@@ -1,3 +1,4 @@
+# coding=utf-8
 from converter import OptionLookupError
 
 # Helpers for common modalities
