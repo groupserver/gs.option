@@ -25,11 +25,15 @@ class OptionQuery(object):
         
         retval = None 
         if r.rowcount:
-            retval = r.fetchone()['value']
-
+            retval = unicode(r.fetchone()['value'], "UTF-8")
+        
+        assert isinstance(retval, unicode)
+        
         return retval
         
     def set(self, value, groupId=None, siteId=None):
+        assert isinstance(value, unicode), "Value must be unicode"
+        
         ot = self.optionTable
         i = ot.insert()
         groupId = groupId or ""

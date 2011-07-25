@@ -17,7 +17,7 @@ from Zope2.App import zcml
 from zope.site.folder import Folder, rootFolder
 
 from Testing.ZopeTestCase import ZopeTestCase
-from gs.option import queries
+from gs.option import queries, ComponentOptions
 
 import random
 import gs.option.sql
@@ -123,39 +123,27 @@ class BasicOptionTest(TestCase):
         zcml.load_config('permissions.zcml', Products.Five)
         zcml.load_config('configure.zcml', gs.option)
         
-        self.gsm.registerUtility(factory=GSRAMOptionFactory, provided=IGSOption)
-        self.gsm.registerUtility(factory=TestOptionsFactory, provided=IGSOptionConverter, name="gs.option.tests.options")
-        self.gsm.registerUtility(factory=TestOptionsFactory2, provided=IGSOptionConverter, name="gs.option.tests2.options")
+        self.gsm.registerUtility(factory=GSRAMOptionFactory, name="groupserver.Option")
+        self.gsm.registerUtility(factory=TestOptionsFactory, name="gs.option.tests.options")
+        self.gsm.registerUtility(factory=TestOptionsFactory2, name="gs.option.tests2.options")
         
-    def test_01_OptionFactoryUtility(self):
-        optionFactory = getUtility(IGSOption)
-        assert isinstance(optionFactory, GSRAMOptionFactory)
-          
-    def test_02_OptionConverterFromOption(self):
-        optionFactory = getUtility(IGSOption)
-        option = optionFactory(None, 'gs.option.tests', 'int_id')
+    def test_01_OptionConverterFromOption(self):
+        option = createObject("groupserver.Option", None, 'gs.option.tests', 'int_id')
         assert isinstance(option.converter, GSIntConverterBasic)
 
     def test_03_OptionFactoryFailedComponentLookup(self):
-        self.assertRaises(ComponentLookupError,
-                          getUtility, IGSOptionConverter, name="gs.option.tests.thisdoesntexist")
-        
-        optionFactory = getUtility(IGSOption)
-        
-        self.assertRaises(ComponentLookupError,
-                          optionFactory, None, 'gs.option.tests.nomodule', 'thisdoesntexist')
+        self.assertRaises(ComponentLookupError, createObject, "groupserver.Option", None, "gs.option.tests.thisdoesntexist", "int_id")
         
     def test_04_OptionStorageNoQualifiers(self):
-        optionFactory = getUtility(IGSOption)
-        option = optionFactory(None, 'gs.option.tests', 'int_id')
+        option = createObject("groupserver.Option", None, 'gs.option.tests', 'int_id')
+
         self.assertEquals(option.get(), None)
         self.assertEquals(option.set(21), None)
         self.assertEquals(option.get(), 21)
         
     def test_05_OptionStorageQualified(self):
-        optionFactory = getUtility(IGSOption)
-        option = optionFactory(None, 'gs.option.tests', 'int_id')
-        
+        option = createObject("groupserver.Option", None, 'gs.option.tests', 'int_id')
+
         self.assertEquals(option.get('someSite'), None)
         self.assertEquals(option.get('someSite','someGroup'), None)
         
@@ -170,16 +158,36 @@ class BasicOptionTest(TestCase):
         self.assertEquals(option.get(), 21)
         
     def test_06_OptionConverter(self):
-        optionFactory = getUtility(IGSOption)
-        option = optionFactory(None, 'gs.option.tests', 'int_id')
+        option = createObject("groupserver.Option", None, 'gs.option.tests', 'int_id')
         
         self.assertRaises(WrongType, option.set, '42', None)
+
+class ComponentOptionsHelperTest(TestCase):
+    def setUp(self):
+        self.gsm = getGlobalSiteManager()
         
+        zcml.load_config('meta.zcml', Products.Five)
+        zcml.load_config('permissions.zcml', Products.Five)
+        zcml.load_config('configure.zcml', gs.option)
+        
+        self.gsm.registerUtility(factory=GSRAMOptionFactory, provided=IGSOption)
+        self.gsm.registerUtility(factory=TestOptionsFactory, provided=IGSOptionConverter, name="gs.option.tests.options")
+        self.gsm.registerUtility(factory=TestOptionsFactory2, provided=IGSOptionConverter, name="gs.option.tests2.options")
+
+    def test_01_OptionsGet(self):
+        options = ComponentOptions(None, "gs.option.tests")
+        # set in previous test set
+        self.assertEquals(options.get("int_id"), 21)
+        self.assertEquals(options.set(42,"int_id"), None)
+        self.assertEquals(options.get("int_id"), 42)
+        
+
 def test_suite():
    suite = TestSuite()
    suite.addTest(makeSuite(RDBBackendTest))
    suite.addTest(makeSuite(RDBOptionTest))
    suite.addTest(makeSuite(BasicOptionTest))
+   suite.addTest(makeSuite(ComponentOptionsHelperTest))
    
    return suite
 
