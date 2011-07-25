@@ -20,9 +20,9 @@ An option is made up of three things:
 To get a value for an option the code the system specifies the identifier
 and the value is returned, set to the correct type.
 
-An option identifier is made up of a module identifier and an
-option identifier. These are used to create an instance that can
-get the option. For example, to get the ``app_id`` option for the
+An option identifier is made up of a module identifier and an option
+identifier. These are used to create an instance that can get and
+set the option. For example, to get the ``app_id`` option of the
 ``gs.profile.signup.facebook`` module the following would be called::
 
    >>> option = createObject("groupserver.Option",
@@ -110,9 +110,9 @@ Each module specifies all the options that it requires. It does this by
 Specifying a Schema
 -------------------
 
-These are specified using standard `Zope schemas`_. For our Facebook
-example the ``gs.profile.signup.facebook.options`` the schema starts
-with the following::
+Options are specified using standard `Zope schemas`_. For our
+``gs.profile.signup.facebook`` example the schema starts with the
+following::
 
     import zope.schema
     import zope.interface
@@ -122,13 +122,16 @@ with the following::
                     title=u"Application ID as supplied by Facebook",
                     required=True)
     
-The same interfaces can be used to document the options, and provide
-forms driven by the schemas and `zope.formlib`_ or `z3c.form`_.
+The same interfaces can be used to document the options. In addition
+forms that are driven by the schemas and either `zope.formlib`_ or
+`z3c.form`_ can be created.
 
 Creating an Option Converter
 ----------------------------
 
-A factory is declared that can return a value cast to the correct type::
+In addition to `specifying a schema`_, each product must also create
+a factory that can convert values to the correct type. The factory
+makes use of a base class and the schema::
 
     from gs.option.converter import GSOptionConverterFactory
 
