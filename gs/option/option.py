@@ -96,3 +96,4 @@ class GSRDBOptionFactory(GSBaseOptionFactory):
     
 class GSRAMOptionFactory(GSBaseOptionFactory):
     backend = GSRAMOption
+
