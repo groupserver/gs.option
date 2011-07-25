@@ -1,5 +1,5 @@
-DATABASE_USER="gstest"
-DATABASE_NAME="gstestdb2"
+DATABASE_USER="gstestdbbeta3pre1user"
+DATABASE_NAME="gstestdbbeta3pre1"
 
 dbSetupDone = False
 

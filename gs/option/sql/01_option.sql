@@ -1,3 +1,6 @@
+SET CLIENT_ENCODING = 'UTF8';
+SET CLIENT_MIN_MESSAGES = WARNING;
+
 CREATE TABLE option (
     component_id      TEXT  NOT NULL,
     option_id         TEXT	NOT NULL,
