@@ -27,7 +27,7 @@ class OptionQuery(object):
         if r.rowcount:
             retval = unicode(r.fetchone()['value'], "UTF-8")
         
-        assert isinstance(retval, unicode)
+            assert isinstance(retval, unicode)
         
         return retval
         
