@@ -98,6 +98,9 @@ the ``Option`` class except the option identifier is always passed in::
     >>> options.get('app_id')
     9
 
+Internally, the ``ComponentOptions`` class uses the same option-factory
+as above.
+
 Declaring Options
 =================
 
@@ -107,18 +110,20 @@ Each module specifies all the options that it requires. It does this by
 Specifying a Schema
 -------------------
 
-These are specified using standard Zope schemas. For example,
-for ``gs.profile.signup.facebook.options`` the schema would look like
-the following::
+These are specified using standard `Zope schemas`_. For our Facebook
+example the ``gs.profile.signup.facebook.options`` the schema starts
+with the following::
 
     import zope.schema
     import zope.interface
 
     class IGSProfileSignupFacebookOptions(zope.interface.Interface):
-        app_id = zope.schema.Text()
+        app_id = zope.schema.TextLine(
+                    title=u"Application ID as supplied by Facebook",
+                    required=True)
     
 The same interfaces can be used to document the options, and provide
-forms driven by the schemas and ``zope.formlib`` or ``z3c.form``.
+forms driven by the schemas and `zope.formlib`_ or `z3c.form`_.
 
 Creating an Option Converter
 ----------------------------
@@ -166,3 +171,6 @@ a class that can convert between the storage-values and the schema
 values. Converters exist for all the standard ``Int``, ``Float``,
 ``Bool`` and ``Text`` types specified in ``zope.schema``.
 
+.. _Zope schemas: http://docs.zope.org/zope.schema/
+.. _zope.formlib: http://docs.zope.org/zope.formlib/
+.. _z3c.form: http://plone.org/documentation/manual/plone-community-developer-documentation/forms/z3c.form
