@@ -86,7 +86,13 @@ class GSBaseOptionFactory(object):
     zope.interface.implements(IFactory)
     backend = None
     def __call__(self, context, componentId, optionId):
-        return self.backend(context, componentId, optionId)
+        try:
+            retval = self.backend(context, componentId, optionId)
+        except ComponentLookupError, cle:
+            m = 'Could not find the option "%s" for the component "%s"' % \
+                (optionId, componentId)
+            raise ValueError(m)
+        return retval
 
     def getInterfaces(self):
         return zope.interface.implementedBy(self.backend)
