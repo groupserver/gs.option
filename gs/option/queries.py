@@ -45,11 +45,11 @@ class OptionQuery(object):
         try:
             session.begin(subtransactions=True)
             session.execute(i,
-                   params={'component_id'=self.componentId,
-                           'option_id'=self.optionId,
-                           'group_id'=groupId,
+                   params={'component_id': self.componentId,
+                           'option_id': self.optionId,
+                           'group_id': groupId,
                            'site_id': siteId,
-                           'value': value)
+                           'value': value})
             session.commit()
         except SQLAlchemyError:
             session.rollback()
