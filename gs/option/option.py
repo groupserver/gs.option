@@ -44,8 +44,7 @@ class GSRDBOption(GSBaseOption):
     zope.interface.implements(interfaces.IGSRDBOption)
     
     def get(self, siteId=None, groupId=None):
-        da = getattr(self.context, 'zsqlalchemy')
-        optionRDB = OptionQuery(da, self.componentId, self.optionId)
+        optionRDB = OptionQuery(self.componentId, self.optionId)
         value = optionRDB.get(siteId, groupId)
         if value:
             value = self.converter.toSchemaValue(value)
@@ -53,8 +52,7 @@ class GSRDBOption(GSBaseOption):
         return value
             
     def set(self, value, siteId=None, groupId=None):
-        da = getattr(self.context, 'zsqlalchemy')
-        optionRDB = OptionQuery(da, self.componentId, self.optionId)
+        optionRDB = OptionQuery(self.componentId, self.optionId)
         value = self.converter.toStorageValue(value)
         optionRDB.set(value, siteId, groupId)
         
