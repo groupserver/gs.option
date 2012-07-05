@@ -28,10 +28,9 @@ class OptionQuery(object):
         
         retval = None 
         if r.rowcount:
-            retval = unicode(r.fetchone()['value'], "UTF-8")
-        
-            assert isinstance(retval, unicode)
-        
+            retval = r.fetchone()['value']
+            assert isinstance(retval, unicode), \
+                'Retval is a %s, not unicode' % type(retval)
         return retval
         
     def set(self, value, groupId=None, siteId=None):
