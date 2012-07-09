@@ -53,28 +53,16 @@ class RDBBaseTest(ZopeTestCase):
         gsm = getGlobalSiteManager()
         gsm.registerUtility(factory=TestOptionsFactory, name="gs.option.tests.options")
         
-        alchemy_adaptor = manage_addZSQLAlchemy(self.folder, 'zsqlalchemy')
-        
-        alchemy_adaptor.manage_changeProperties(hostname='localhost',
-                                                port=5432,
-                                                username=ds.DATABASE_USER,
-                                                password='',
-                                                dbtype='postgres',
-                                                database=ds.DATABASE_NAME)
-        
-        self.da = alchemy_adaptor
         self.componentId = 'component_id'
         self.optionId = 'option_id'
         
 class RDBBackendTest(RDBBaseTest):
     def test_01_OptionQuery(self):
-        optionQuery = queries.OptionQuery(self.da,
-                                          self.componentId,
+        optionQuery = queries.OptionQuery(self.componentId,
                                           self.optionId)
         
     def test_02_SetGetOption(self):
-        optionQuery = queries.OptionQuery(self.da,
-                                          self.componentId,
+        optionQuery = queries.OptionQuery(self.componentId,
                                           self.optionId)
         rid1 = unicode(random.random())
         rid2 = unicode(random.random())

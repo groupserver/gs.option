@@ -32,7 +32,8 @@ setup(name='gs.option',
     zip_safe=True,
     install_requires=[
         'setuptools',
-        'sqlalchemy'
+        'sqlalchemy',
+        'gs.database'
         # -*- Extra requirements: -*-
     ],
     entry_points="""

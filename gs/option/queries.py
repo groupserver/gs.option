@@ -1,10 +1,12 @@
 # coding=utf-8
 import sqlalchemy as sa
-from sqlalchemy.exceptions import SQLError
+from sqlalchemy.exc import SQLAlchemyError
+from zope.sqlalchemy import mark_changed
+from gs.database import getTable, getSession
 
 class OptionQuery(object):
-    def __init__(self, da, componentId, optionId):
-        self.optionTable = da.createTable('option')
+    def __init__(self, componentId, optionId):
+        self.optionTable = getTable('option')
         self.componentId = componentId
         self.optionId = optionId
         
@@ -19,16 +21,16 @@ class OptionQuery(object):
         s.append_whereclause(ot.c.option_id==self.optionId)
         s.append_whereclause(ot.c.group_id==groupId)
         s.append_whereclause(ot.c.site_id==siteId)
-        
-        r = s.execute()
+
+        session = getSession()
+        r = session.execute(s)
         assert (r.rowcount <= 1), "More than one option found matching criteria"
         
         retval = None 
         if r.rowcount:
-            retval = unicode(r.fetchone()['value'], "UTF-8")
-        
-            assert isinstance(retval, unicode)
-        
+            retval = r.fetchone()['value']
+            assert isinstance(retval, unicode), \
+                'Retval is a %s, not unicode' % type(retval)
         return retval
         
     def set(self, value, groupId=None, siteId=None):
@@ -38,16 +40,25 @@ class OptionQuery(object):
         i = ot.insert()
         groupId = groupId or ""
         siteId = siteId or ""
+        session = getSession()
         try:
-            i.execute(component_id=self.componentId,
-                      option_id=self.optionId,
-                      group_id=groupId,
-                      site_id=siteId,
-                      value=value)
-        except SQLError:
+            session.begin(subtransactions=True)
+            session.execute(i,
+                   params={'component_id': self.componentId,
+                           'option_id': self.optionId,
+                           'group_id': groupId,
+                           'site_id': siteId,
+                           'value': value})
+            session.commit()
+        except SQLAlchemyError:
+            session.rollback()
+            session = getSession()
+            session.begin(subtransactions=True)
             u = ot.update(sa.and_(ot.c.component_id==self.componentId,
                       ot.c.option_id==self.optionId,
                       ot.c.group_id==groupId,
                       ot.c.site_id==siteId))
-            u.execute(value=value)
+
+            session.execute(u, params={'value': value})
+            session.commit()
 
