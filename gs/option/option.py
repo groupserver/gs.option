@@ -86,10 +86,12 @@ class GSBaseOptionFactory(object):
     zope.interface.implements(IFactory)
     backend = None
     def __call__(self, context, componentId, optionId):
+        assert self.backend, 'No backend for the option!'
         try:
             retval = self.backend(context, componentId, optionId)
         except ComponentLookupError, cle:
-            m = 'Could not find the option "%s" for the component "%s"' % \
+            m = 'Could not find the option "%s" for the component "%s" '\
+                'Is the Utility set up correctly?' % \
                 (optionId, componentId)
             raise ValueError(m)
         return retval
