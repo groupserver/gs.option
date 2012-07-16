@@ -33,7 +33,11 @@ setup(name='gs.option',
     install_requires=[
         'setuptools',
         'sqlalchemy',
-        'gs.database'
+        'gs.database',
+        'zope.component',
+        'zope.interface',
+        'zope.schema',
+        'zope.sqlalchemy',
         # -*- Extra requirements: -*-
     ],
     entry_points="""
