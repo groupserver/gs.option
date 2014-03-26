@@ -1,41 +1,57 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
+##############################################################################
+#
+# Copyright © 2012, 2013, 2014 OnlineGroups.net and Contributors.
+# All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+from __future__ import absolute_import, unicode_literals
 import sqlalchemy as sa
 from sqlalchemy.exc import SQLAlchemyError
-from zope.sqlalchemy import mark_changed
 from gs.database import getTable, getSession
+
 
 class OptionQuery(object):
     def __init__(self, componentId, optionId):
         self.optionTable = getTable('option')
         self.componentId = componentId
         self.optionId = optionId
-        
+
     def get(self, groupId=None, siteId=None):
         ot = self.optionTable
         s = ot.select()
-        
+
         groupId = groupId or ""
         siteId = siteId or ""
-        
-        s.append_whereclause(ot.c.component_id==self.componentId)
-        s.append_whereclause(ot.c.option_id==self.optionId)
-        s.append_whereclause(ot.c.group_id==groupId)
-        s.append_whereclause(ot.c.site_id==siteId)
+
+        s.append_whereclause(ot.c.component_id == self.componentId)
+        s.append_whereclause(ot.c.option_id == self.optionId)
+        s.append_whereclause(ot.c.group_id == groupId)
+        s.append_whereclause(ot.c.site_id == siteId)
 
         session = getSession()
         r = session.execute(s)
         assert (r.rowcount <= 1), "More than one option found matching criteria"
-        
-        retval = None 
+
+        retval = None
         if r.rowcount:
             retval = r.fetchone()['value']
-            assert isinstance(retval, unicode), \
-                'Retval is a %s, not unicode' % type(retval)
+            assert isinstance(retval, basestring), \
+                'Retval is a %s, not a string' % type(retval)
         return retval
-        
+
     def set(self, value, groupId=None, siteId=None):
-        assert isinstance(value, unicode), "Value must be unicode"
-        
+        if not isinstance(value, unicode):
+            msg = "Value must be unicode, not {0}".format(type(value))
+            raise TypeError(msg)
+
         ot = self.optionTable
         i = ot.insert()
         groupId = groupId or ""
@@ -54,11 +70,10 @@ class OptionQuery(object):
             session.rollback()
             session = getSession()
             session.begin(subtransactions=True)
-            u = ot.update(sa.and_(ot.c.component_id==self.componentId,
-                      ot.c.option_id==self.optionId,
-                      ot.c.group_id==groupId,
-                      ot.c.site_id==siteId))
+            u = ot.update(sa.and_(ot.c.component_id == self.componentId,
+                      ot.c.option_id == self.optionId,
+                      ot.c.group_id == groupId,
+                      ot.c.site_id == siteId))
 
             session.execute(u, params={'value': value})
             session.commit()
-
