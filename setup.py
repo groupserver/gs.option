@@ -12,17 +12,22 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
+import codecs
 import os
 from setuptools import setup, find_packages
 from version import get_version
 
 version = get_version()
 
+with codecs.open('README.txt', encoding='utf-8') as f:
+    long_description = f.read()
+with codecs.open(os.path.join("docs", "HISTORY.txt"), encoding='utf-8') as f:
+    long_description += '\n' + f.read()
+
 setup(name='gs.option',
     version=version,
     description="Get and set options related to the GroupServer universe.",
-    long_description=open("README.txt").read() + "\n" +
-                      open(os.path.join("docs", "HISTORY.txt")).read(),
+    long_description=long_description,
     classifiers=[
       "Development Status :: 4 - Beta",
       "Environment :: Web Environment",
@@ -52,6 +57,8 @@ setup(name='gs.option',
         'zope.component',
         'zope.interface',
     ],
+    test_suite="gs.core.test.test_all",
+    tests_require=['Zope2', 'zope.schema', ],
     entry_points="""
     # -*- Entry points: -*-
     """,)
