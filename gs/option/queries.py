@@ -43,15 +43,9 @@ class OptionQuery(object):
         retval = None
         if r.rowcount:
             retval = r.fetchone()['value']
-            assert isinstance(retval, basestring), \
-                'Retval is a %s, not a string' % type(retval)
         return retval
 
     def set(self, value, groupId=None, siteId=None):
-        if not isinstance(value, unicode):
-            msg = "Value must be unicode, not {0}".format(type(value))
-            raise TypeError(msg)
-
         ot = self.optionTable
         i = ot.insert()
         groupId = groupId or ""

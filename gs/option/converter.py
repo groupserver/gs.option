@@ -13,6 +13,11 @@
 #
 ##############################################################################
 from __future__ import absolute_import, unicode_literals
+import sys
+if (sys.version_info < (3, )):
+    u = unicode
+else:
+    u = str
 from zope.component import getMultiAdapter
 from zope.interface import implements
 from zope.interface.declarations import Implements
@@ -58,7 +63,7 @@ class GSBaseConverter(object):
 
     def toStorageValue(self, value):
         self.schemaoption.validate(value)
-        retval = unicode(value)
+        retval = u(value)
         return retval
 
     def toSchemaValue(self, value):

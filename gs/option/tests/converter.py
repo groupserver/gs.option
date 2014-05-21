@@ -13,36 +13,22 @@
 #
 ##############################################################################
 from __future__ import absolute_import, unicode_literals
+import sys
+if (sys.version_info < (3, )):
+    longInt = long
+    unicodeStr = unicode
+else:
+    longInt = int
+    unicodeStr = str
 from unittest import TestCase
 from zope.component import (getGlobalSiteManager, createObject)
-import zope.interface
-from zope.schema import Text, Int, Bool, Float
 from zope.schema.interfaces import WrongType
 import Products.Five
 from Zope2.App import zcml
 import gs.option
-from gs.option.converter import (GSOptionConverterFactory, GSIntConverterBasic,
-    GSTextConverterBasic)
+from gs.option.converter import (GSIntConverterBasic, GSTextConverterBasic)
 import gs.option.sql
-
-
-class ITestOptions(zope.interface.Interface):
-    text_id = Text()
-    int_id = Int()
-    bool_id = Bool()
-    float_id = Float()
-
-
-class ITestOptions2(zope.interface.Interface):
-    int_id = Int()
-
-
-class TestOptionsFactory(GSOptionConverterFactory):
-    interface = ITestOptions
-
-
-class TestOptionsFactory2(GSOptionConverterFactory):
-    interface = ITestOptions2
+from .interfaces import (TestOptionsFactory, TestOptionsFactory2)
 
 
 class ConverterTest(TestCase):
@@ -58,22 +44,22 @@ class ConverterTest(TestCase):
         self.gsm.registerUtility(factory=TestOptionsFactory2,
                                     name="gs.option.tests2.options")
 
-    def testOptionConverterFactory(self):
+    def test_OptionConverterFactory(self):
         option = createObject('groupserver.Option', None, 'gs.option.tests2',
                                 'int_id')
 
         optionConverter = createObject("gs.option.tests.options", None,
                                         "text_id", option)
-        assert isinstance(optionConverter, GSTextConverterBasic)
+        self.assertIsInstance(optionConverter, GSTextConverterBasic)
 
         optionConverter = createObject("gs.option.tests.options", None,
                                         "int_id", option)
-        assert isinstance(optionConverter, GSIntConverterBasic)
+        self.assertIsInstance(optionConverter, GSIntConverterBasic)
 
-    def testOptionConverterFromOption(self):
+    def test_OptionConverterFromOption(self):
         option = createObject('groupserver.Option', None, 'gs.option.tests',
                                 'int_id')
-        assert isinstance(option.converter, GSIntConverterBasic)
+        self.assertIsInstance(option.converter, GSIntConverterBasic)
 
 
 class BaseConverterTest(TestCase):
@@ -92,6 +78,9 @@ class BaseConverterTest(TestCase):
         self._setupOption()
 
 
+WRONG_VALUES = [[1, 2, 3], (1, 2, 3), {'1': 2}]
+
+
 class IntTest(BaseConverterTest):
     def _setupOption(self):
         self.option = createObject('groupserver.Option', None,
@@ -100,24 +89,18 @@ class IntTest(BaseConverterTest):
     def testConvertToSchemaValue(self):
         self.assertEqual(type(self.option.converter.toSchemaValue('1')), int)
         self.assertEqual(type(self.option.converter.toSchemaValue('1' * 100)),
-                            long)
+                            longInt)
 
     def testConvertToStorageValue(self):
-        self.assertEqual(type(self.option.converter.toStorageValue(1)), unicode)
+        self.assertEqual(type(self.option.converter.toStorageValue(1)),
+                        unicodeStr)
         self.assertEqual(type(self.option.converter.toStorageValue(10 ** 100)),
-                            unicode)
+                            unicodeStr)
 
     def testFailValidation(self):
-        self.assertRaises(WrongType, self.option.converter.toStorageValue, 1.0)
-        self.assertRaises(WrongType, self.option.converter.toStorageValue, '1')
-        #self.assertRaises(WrongType, self.option.converter.toStorageValue,
-        #                    u'1')
-        self.assertRaises(WrongType, self.option.converter.toStorageValue,
-                                [1, 2, 3])
-        self.assertRaises(WrongType, self.option.converter.toStorageValue,
-                                (1, 2, 3))
-        self.assertRaises(WrongType, self.option.converter.toStorageValue,
-                                {'1': 2})
+        for wv in WRONG_VALUES + [1.0, '1']:
+            self.assertRaises(WrongType, self.option.converter.toStorageValue,
+                                wv)
 
 
 class BoolTest(BaseConverterTest):
@@ -133,21 +116,14 @@ class BoolTest(BaseConverterTest):
 
     def testConvertToStorageValue(self):
         self.assertEqual(type(self.option.converter.toStorageValue(True)),
-                            unicode)
+                            unicodeStr)
         self.assertEqual(type(self.option.converter.toStorageValue(False)),
-                            unicode)
+                            unicodeStr)
 
     def testFailValidation(self):
-        self.assertRaises(WrongType, self.option.converter.toStorageValue, 1.0)
-        self.assertRaises(WrongType, self.option.converter.toStorageValue, '1')
-        #self.assertRaises(WrongType, self.option.converter.toStorageValue,
-                            #u'1')
-        self.assertRaises(WrongType, self.option.converter.toStorageValue,
-                            [1, 2, 3])
-        self.assertRaises(WrongType, self.option.converter.toStorageValue,
-                            (1, 2, 3))
-        self.assertRaises(WrongType, self.option.converter.toStorageValue,
-                            {'1': 2})
+        for wv in WRONG_VALUES + [1.0, '1']:
+            self.assertRaises(WrongType, self.option.converter.toStorageValue,
+                                wv)
 
 
 class FloatTest(BaseConverterTest):
@@ -163,20 +139,14 @@ class FloatTest(BaseConverterTest):
 
     def off_testConvertToStorageValue(self):
         self.assertEqual(type(self.option.converter.toStorageValue(1.0)),
-                            unicode)
+                            unicodeStr)
         r = self.option.converter.toStorageValue(10.0 ** 100)
-        self.assertEqual(type(r), unicode)
+        self.assertEqual(type(r), unicodeStr)
 
     def testFailValidation(self):
-        self.assertRaises(WrongType, self.option.converter.toStorageValue, '1')
-        #self.assertRaises(WrongType, self.option.converter.toStorageValue,
-                            #u'1')
-        self.assertRaises(WrongType, self.option.converter.toStorageValue,
-                            [1, 2, 3])
-        self.assertRaises(WrongType, self.option.converter.toStorageValue,
-                            (1, 2, 3))
-        self.assertRaises(WrongType, self.option.converter.toStorageValue,
-                            {'1': 2})
+        for wv in WRONG_VALUES + ['1']:
+            self.assertRaises(WrongType, self.option.converter.toStorageValue,
+                                wv)
 
 
 class TextTest(BaseConverterTest):
@@ -186,21 +156,13 @@ class TextTest(BaseConverterTest):
 
     def off_testConvertToSchemaValue(self):
         r = self.option.converter.toSchemaValue('This is some text')
-        self.assertEqual(type(r), unicode)  # Python 3 issues
+        self.assertEqual(type(r), unicodeStr)
 
     def off_testConvertToStorageValue(self):
         r = self.option.converter.toStorageValue('this is some text')
-        self.assertEqual(type(r), unicode)  # Python 3 issues
+        self.assertEqual(type(r), unicodeStr)
 
     def testFailValidation(self):
-        self.assertRaises(WrongType, self.option.converter.toStorageValue,
-                            'non-unicode text')
-        self.assertRaises(WrongType, self.option.converter.toStorageValue, True)
-        self.assertRaises(WrongType, self.option.converter.toStorageValue, 1)
-        self.assertRaises(WrongType, self.option.converter.toStorageValue, 1.0)
-        self.assertRaises(WrongType, self.option.converter.toStorageValue,
-                            [1, 2, 3])
-        self.assertRaises(WrongType, self.option.converter.toStorageValue,
-                            (1, 2, 3))
-        self.assertRaises(WrongType, self.option.converter.toStorageValue,
-                            {'1': 2})
+        for wv in WRONG_VALUES + [1.0, 1, True]:
+            self.assertRaises(WrongType, self.option.converter.toStorageValue,
+                                wv)
