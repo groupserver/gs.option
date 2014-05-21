@@ -37,6 +37,10 @@ setup(name='gs.option',
       "Natural Language :: English",
       "Operating System :: POSIX :: Linux"
       "Programming Language :: Python",
+      "Programming Language :: Python :: 2",
+      "Programming Language :: Python :: 2.7",
+      # Python 3 is not supported because Zope 2 has issues.
+      "Programming Language :: Python :: Implementation :: CPython",
       "Topic :: Software Development :: Libraries :: Python Modules",
       ],
     keywords='groupserver option options',
