@@ -16,7 +16,7 @@ from __future__ import absolute_import, unicode_literals
 from zope.component import createObject
 from zope.component.factory import IFactory
 from zope.component.interfaces import ComponentLookupError
-from zope.interface import implements, implementedBy
+from zope.interface import implementer, implementedBy
 from .interfaces import IGSRDBOption, IGSRAMOption
 from .queries import OptionQuery
 
@@ -54,11 +54,11 @@ class GSBaseOption(object):
         raise NotImplementedError
 
 
+@implementer(IGSRDBOption)
 class GSRDBOption(GSBaseOption):
     """ An option class using a relational backend.
 
     """
-    implements(IGSRDBOption)
 
     def get(self, siteId=None, groupId=None):
         optionRDB = OptionQuery(self.componentId, self.optionId)
@@ -74,11 +74,11 @@ class GSRDBOption(GSBaseOption):
         optionRDB.set(value, siteId, groupId)
 
 
+@implementer(IGSRAMOption)
 class GSRAMOption(GSBaseOption):
     """ An option class using a RAM backend. Changes will be lost
     between restarts."""
     _backend_dict = {}
-    implements(IGSRAMOption)
 
     def __init__(self, context, componentId, optionId):
         GSBaseOption.__init__(self, context, componentId, optionId)
@@ -97,8 +97,8 @@ class GSRAMOption(GSBaseOption):
         self._backend_dict[key] = value
 
 
+@implementer(IFactory)
 class GSBaseOptionFactory(object):
-    implements(IFactory)
     backend = None
 
     def __call__(self, context, componentId, optionId):
