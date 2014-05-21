@@ -20,6 +20,9 @@ from . import database_setup as ds
 from .interfaces import TestOptionsFactory
 
 
+# -=mpj17=-- I am not at all confident about running these tests, as they can
+# munge a database. So I am leaving them out of the test_all for now.
+
 class RDBBaseTest(ZopeTestCase):
     def afterSetUp(self):
         if not ds.dbSetupDone:
