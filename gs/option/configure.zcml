@@ -1,50 +1,61 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Copyright © 2012, 2014 OnlineGroups.net and Contributors. -->
+<!-- All Rights Reserved. -->
+
+<!-- This software is subject to the provisions of the Zope Public -->
+<!-- License, Version 2.1 (ZPL).  A copy of the ZPL should accompany this -->
+<!-- distribution. -->
+
+<!-- THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED -->
+<!-- WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED -->
+<!-- WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND -->
+<!-- FITNESS FOR A PARTICULAR PURPOSE. -->
 <configure
-    xmlns="http://namespaces.zope.org/zope"
-    xmlns:i18n="http://namespaces.zope.org/i18n">
-    
+  xmlns="http://namespaces.zope.org/zope"
+  xmlns:i18n="http://namespaces.zope.org/i18n">
+
   <!-- Data Converters -->
-  
-    <!-- For IGSRDBOption -->
-      <adapter
-          factory="gs.option.converter.GSIntConverterBasic"
-          for="zope.schema.interfaces.IInt gs.option.interfaces.IGSRDBOption"
-          />
-      <adapter
-          factory="gs.option.converter.GSFloatConverterBasic"
-          for="zope.schema.interfaces.IFloat gs.option.interfaces.IGSRDBOption"
-          />
-      <adapter
-          factory="gs.option.converter.GSBoolConverterBasic"
-          for="zope.schema.interfaces.IBool gs.option.interfaces.IGSRDBOption"
-          />
-      <adapter
-          factory="gs.option.converter.GSTextConverterBasic"
-          for="zope.schema.interfaces.IText gs.option.interfaces.IGSRDBOption"
-          />
-          
-    <!-- For IGSRAMOption -->
-      <adapter
-          factory="gs.option.converter.GSIntConverterBasic"
-          for="zope.schema.interfaces.IInt gs.option.interfaces.IGSRAMOption"
-          />
-      <adapter
-          factory="gs.option.converter.GSFloatConverterBasic"
-          for="zope.schema.interfaces.IFloat gs.option.interfaces.IGSRAMOption"
-          />
-      <adapter
-          factory="gs.option.converter.GSBoolConverterBasic"
-          for="zope.schema.interfaces.IBool gs.option.interfaces.IGSRAMOption"
-          />
-      <adapter
-          factory="gs.option.converter.GSTextConverterBasic"
-          for="zope.schema.interfaces.IText gs.option.interfaces.IGSRAMOption"
-          />
-          
+
+  <!-- For IGSRDBOption -->
+  <adapter
+    factory="gs.option.converter.GSIntConverterBasic"
+    for="zope.schema.interfaces.IInt gs.option.interfaces.IGSRDBOption"
+    />
+  <adapter
+    factory="gs.option.converter.GSFloatConverterBasic"
+    for="zope.schema.interfaces.IFloat gs.option.interfaces.IGSRDBOption"
+    />
+  <adapter
+    factory="gs.option.converter.GSBoolConverterBasic"
+    for="zope.schema.interfaces.IBool gs.option.interfaces.IGSRDBOption"
+    />
+  <adapter
+    factory="gs.option.converter.GSTextConverterBasic"
+    for="zope.schema.interfaces.IText gs.option.interfaces.IGSRDBOption"
+    />
+
+  <!-- For IGSRAMOption -->
+  <adapter
+    factory="gs.option.converter.GSIntConverterBasic"
+    for="zope.schema.interfaces.IInt gs.option.interfaces.IGSRAMOption"
+    />
+  <adapter
+    factory="gs.option.converter.GSFloatConverterBasic"
+    for="zope.schema.interfaces.IFloat gs.option.interfaces.IGSRAMOption"
+    />
+  <adapter
+    factory="gs.option.converter.GSBoolConverterBasic"
+    for="zope.schema.interfaces.IBool gs.option.interfaces.IGSRAMOption"
+    />
+  <adapter
+    factory="gs.option.converter.GSTextConverterBasic"
+    for="zope.schema.interfaces.IText gs.option.interfaces.IGSRAMOption"
+    />
+
   <!-- Option -->
-  <utility 
+  <utility
     factory="gs.option.option.GSRDBOptionFactory"
     name="groupserver.Option"
     />
-    
+
 </configure>
