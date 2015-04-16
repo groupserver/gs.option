@@ -37,7 +37,9 @@ def dbsetup():
         sys.exit(1)
 
 
-def dbTable(module, filename, dropTables=[]):
+def dbTable(module, filename, dropTables=None):
+    if dropTables is None:
+        dropTables = []
     path = module.__path__[0]
     sql_filepath = os.path.join(path, filename)
     for table in dropTables:
