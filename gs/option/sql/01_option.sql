@@ -3,7 +3,7 @@ SET CLIENT_MIN_MESSAGES = WARNING;
 
 CREATE TABLE option (
     component_id      TEXT  NOT NULL,
-    option_id         TEXT	NOT NULL,
+    option_id         TEXT  NOT NULL,
     site_id           TEXT  NOT NULL,
     group_id          TEXT  NOT NULL,
     value             TEXT
